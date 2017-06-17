@@ -83,12 +83,12 @@ public class AsciidocConfluencePage {
         return unmodifiableMap(this.attachments);
     }
 
-    public static AsciidocConfluencePage newAsciidocConfluencePage(InputStream adoc, String templatesDir, String imagesOutDir, Path pagePath) {
+    public static AsciidocConfluencePage newAsciidocConfluencePage(InputStream adoc, Path pagePath, AsciidocOptions asciidocOptions) {
         Map<String, String> attachmentCollector = new HashMap<>();
 
         String adocContent = readFull(adoc);
 
-        Options options = options(templatesDir, parentFolder(pagePath), imagesOutDir);
+        Options options = options(parentFolder(pagePath), asciidocOptions);
         String pageContent = convertedContent(adocContent, options, pagePath, attachmentCollector);
 
         String pageTitle = pageTitle(adocContent);
@@ -154,8 +154,8 @@ public class AsciidocConfluencePage {
         return pagePath.getParent().toFile();
     }
 
-    private static Options options(String templateDir, File baseDir, String imagesOutDir) {
-        File templateDirFolder = new File(templateDir);
+    private static Options options(File baseDir, AsciidocOptions asciidocOptions) {
+        File templateDirFolder = new File(asciidocOptions.getTemplateDir());
 
         if (!templateDirFolder.exists()) {
             throw new RuntimeException("templateDir folder does not exist");
@@ -166,8 +166,8 @@ public class AsciidocConfluencePage {
         }
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("imagesoutdir", imagesOutDir);
-        attributes.put("outdir", imagesOutDir);
+        attributes.put("imagesoutdir", asciidocOptions.getImagesOutDir());
+        attributes.put("outdir", asciidocOptions.getImagesOutDir());
 
         return OptionsBuilder.options()
                 .backend("html")

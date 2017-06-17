@@ -19,6 +19,7 @@ package org.sahli.asciidoc.confluence.publisher.maven.plugin;
 import org.apache.commons.io.IOUtils;
 import org.sahli.asciidoc.confluence.publisher.client.metadata.ConfluencePageMetadata;
 import org.sahli.asciidoc.confluence.publisher.client.metadata.ConfluencePublisherMetadata;
+import org.sahli.asciidoc.confluence.publisher.converter.AsciidocOptions;
 import org.sahli.asciidoc.confluence.publisher.converter.AsciidocConfluencePage;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -49,11 +50,11 @@ final class AsciidocConfluenceConverter {
         throw new UnsupportedOperationException("Instantiation not supported");
     }
 
-    static ConfluencePublisherMetadata convertAndBuildConfluencePages(String asciidocRootFolderPath, String generatedDocOutputPath, String asciidocConfluenceTemplatesPath, String spaceKey, String ancestorId) throws IOException {
+    static ConfluencePublisherMetadata convertAndBuildConfluencePages(String asciidocRootFolderPath, String generatedDocOutputPath, AsciidocOptions asciidocOptions, String spaceKey, String ancestorId) throws IOException {
         ConfluencePublisherMetadata confluencePublisherMetadata = initializeConfluencePublisherMetadata(spaceKey, ancestorId);
 
-        AsciidocConfluenceConverter.AdocFileVisitor visitor = new AsciidocConfluenceConverter.AdocFileVisitor(asciidocRootFolderPath, generatedDocOutputPath,
-                asciidocConfluenceTemplatesPath);
+        // TODO klaus hier müssen options reingehen
+        AsciidocConfluenceConverter.AdocFileVisitor visitor = new AsciidocConfluenceConverter.AdocFileVisitor(asciidocRootFolderPath, generatedDocOutputPath, asciidocOptions);
         walkFileTree(Paths.get(asciidocRootFolderPath), visitor);
 
         MultiValueMap<String, ConfluencePageMetadata> confluencePublisherMetadataRegistry = visitor.confluencePageMetadataRegistry();
@@ -97,13 +98,13 @@ final class AsciidocConfluenceConverter {
         private static final String INCLUDE_FILE_PREFIX = "_";
         private final String asciidocRootFolder;
         private final String generatedDocOutputPath;
-        private final String asciidocConfluenceTemplatesPath;
         private final MultiValueMap<String, ConfluencePageMetadata> confluencePageMetadataRegistry = new LinkedMultiValueMap<>();
+        private final AsciidocOptions asciidocOptions;
 
-        private AdocFileVisitor(String asciidocRootFolder, String generatedDocOutputPath, String asciidocConfluenceTemplatesPath) {
+        private AdocFileVisitor(String asciidocRootFolder, String generatedDocOutputPath, AsciidocOptions asciidocOptions) {
             this.asciidocRootFolder = asciidocRootFolder;
             this.generatedDocOutputPath = generatedDocOutputPath;
-            this.asciidocConfluenceTemplatesPath = asciidocConfluenceTemplatesPath;
+            this.asciidocOptions = asciidocOptions;
         }
 
         @Override
@@ -117,7 +118,7 @@ final class AsciidocConfluenceConverter {
             String absolutePath = file.toFile().getAbsolutePath();
             String relativePath = absolutePath.substring(this.asciidocRootFolder.length() + 1);
             File targetFile = new File(this.generatedDocOutputPath, relativePath);
-            String imagesOutDir = targetFile.getParent();
+            this.asciidocOptions.setImagesOutDir(targetFile.getParent());
 
             createMissingDirectories(targetFile);
 
@@ -125,7 +126,7 @@ final class AsciidocConfluenceConverter {
                 if (isAdocFile(file)) {
                     File confluenceHtmlOutputFile = replaceFileExtension(targetFile, "html");
                     confluenceHtmlOutputFile.createNewFile();
-                    AsciidocConfluencePage asciidocConfluencePage = newAsciidocConfluencePage(Files.newInputStream(file), this.asciidocConfluenceTemplatesPath, imagesOutDir, file);
+                    AsciidocConfluencePage asciidocConfluencePage = newAsciidocConfluencePage(Files.newInputStream(file), file, this.asciidocOptions);
                     write(asciidocConfluencePage.content(), new FileOutputStream(confluenceHtmlOutputFile), "UTF-8");
 
                     ConfluencePageMetadata confluencePageMetadata = new ConfluencePageMetadata();

@@ -28,6 +28,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.sahli.asciidoc.confluence.publisher.client.ConfluencePublisher;
 import org.sahli.asciidoc.confluence.publisher.client.http.ConfluenceRestClient;
 import org.sahli.asciidoc.confluence.publisher.client.metadata.ConfluencePublisherMetadata;
+import org.sahli.asciidoc.confluence.publisher.converter.AsciidocOptions;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -87,8 +88,10 @@ public class AsciidocConfluencePublisherMojo extends AbstractMojo {
             extractTemplatesFromJar();
             this.generatedDocOutputPath.mkdirs();
 
+            AsciidocOptions asciidocOptions = new AsciidocOptions(this.asciidocConfluenceTemplates.getAbsolutePath());
+
             ConfluencePublisherMetadata confluencePublisherMetadata = convertAndBuildConfluencePages(this.asciidocRootFolder.getAbsolutePath(),
-                    this.generatedDocOutputPath.getAbsolutePath(), this.asciidocConfluenceTemplates.getAbsolutePath(), this.spaceKey, this.ancestorId);
+                    this.generatedDocOutputPath.getAbsolutePath(), asciidocOptions, this.spaceKey, this.ancestorId);
 
             publish(confluencePublisherMetadata);
         } catch (Exception e) {

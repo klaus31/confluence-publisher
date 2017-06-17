@@ -19,6 +19,7 @@ package org.sahli.asciidoc.confluence.publisher.maven.plugin;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.sahli.asciidoc.confluence.publisher.converter.AsciidocOptions;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -51,7 +52,7 @@ public class AsciidocConfluenceConverterTest {
         copyDirectory(new File(CLASSPATH_DOC_LOCATION), docFolder);
 
         // act
-        convertAndBuildConfluencePages(docFolderPath, generatedDocOutputPath, TEMPLATES_PATH, "~personalSpace", "1234");
+        convertAndBuildConfluencePages(docFolderPath, generatedDocOutputPath, new AsciidocOptions(TEMPLATES_PATH), "~personalSpace", "1234");
 
         // assert
         assertThat("index.html", Files.exists(Paths.get(generatedDocOutputPath, "index.html")), is(true));
