@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,14 +82,20 @@ public class AsciidocConfluencePublisherMojo extends AbstractMojo {
     @Parameter
     private String password;
 
+    @Parameter
+    private Map<String, Object> attributes;
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if(attributes == null) {
+            attributes = new HashMap<>();
+        }
         try {
             extractTemplatesFromJar();
             this.generatedDocOutputPath.mkdirs();
 
-            AsciidocOptions asciidocOptions = new AsciidocOptions(this.asciidocConfluenceTemplates.getAbsolutePath());
+            AsciidocOptions asciidocOptions = new AsciidocOptions(this.asciidocConfluenceTemplates.getAbsolutePath(), attributes);
 
             ConfluencePublisherMetadata confluencePublisherMetadata = convertAndBuildConfluencePages(this.asciidocRootFolder.getAbsolutePath(),
                     this.generatedDocOutputPath.getAbsolutePath(), asciidocOptions, this.spaceKey, this.ancestorId);

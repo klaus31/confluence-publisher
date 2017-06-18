@@ -78,6 +78,10 @@ The Confluence Publisher is configured with the help of a Maven plugin. A typica
         <ancestorId>327706</ancestorId>
         <username>username</username> <!-- or read from property -->
         <password>password</password> <!-- or read from property -->
+        <attributes>
+          <basedir>${project.basedir}</basedir>
+          <custom>foo</custom>
+        </attributes>
       </configuration>
     </plugin>
   </plugins>
@@ -104,4 +108,7 @@ The Confluence Publisher is configured with the help of a Maven plugin. A typica
 
 | password
 | The password of the user to use for publishing
+
+| attributes
+| Custom http://asciidoctor.org/docs/user-manual/#attributes[attributes] holding custom replacement content
 |===

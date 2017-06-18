@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.containsString;
@@ -45,6 +47,7 @@ import static org.sahli.asciidoc.confluence.publisher.converter.AsciidocConfluen
  */
 public class AsciidocConfluencePageTest {
 
+    private static final String TEMPLATE_DIR = "src/main/resources/org/sahli/asciidoc/confluence/publisher/converter/templates";
     private AsciidocOptions asciidocOptions;
 
     @ClassRule
@@ -55,8 +58,8 @@ public class AsciidocConfluencePageTest {
 
     @Before
     public void setupDefaultAsciidocOptions() {
-        asciidocOptions = new AsciidocOptions("src/main/resources/org/sahli/asciidoc/confluence/publisher/converter/templates");
-        asciidocOptions.setImagesOutDir(temporaryPath().toString());
+        Map<String, Object> attributes = new HashMap<>();
+        setupAsciidocOptions(attributes);
     }
 
     @Test
@@ -226,6 +229,23 @@ public class AsciidocConfluencePageTest {
                 "<h3>Title level 3</h3>" +
                 "<h4>Title level 4</h4>" +
                 "<h5>Title level 5</h5>";
+        assertThat(asciidocConfluencePage.content(), is(expectedContent));
+    }
+
+    @Test
+    public void renderConfluencePage_asciiDocWithAttribute_returnsAttributeValue() throws Exception {
+        // arrange
+        String adocContent = "It is a custom {foo}!";
+        InputStream is = stringAsInputStream(prependTitle(adocContent));
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("foo", "Attribute");
+        setupAsciidocOptions(attributes);
+
+        // act
+        AsciidocConfluencePage asciidocConfluencePage = newAsciidocConfluencePage(is, dummyPagePath(), asciidocOptions);
+
+        // assert
+        String expectedContent = "<p>It is a custom Attribute!</p>";
         assertThat(asciidocConfluencePage.content(), is(expectedContent));
     }
 
@@ -901,6 +921,11 @@ public class AsciidocConfluencePageTest {
         } catch (IOException e) {
             throw new IllegalStateException("unable to create temporary path", e);
         }
+    }
+
+    private void setupAsciidocOptions(Map<String, Object> attributes) {
+        asciidocOptions = new AsciidocOptions(TEMPLATE_DIR, attributes);
+        asciidocOptions.setImagesOutDir(temporaryPath().toString());
     }
 
 }

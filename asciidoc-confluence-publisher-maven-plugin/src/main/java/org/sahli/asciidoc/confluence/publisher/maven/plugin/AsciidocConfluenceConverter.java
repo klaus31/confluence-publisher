@@ -53,7 +53,6 @@ final class AsciidocConfluenceConverter {
     static ConfluencePublisherMetadata convertAndBuildConfluencePages(String asciidocRootFolderPath, String generatedDocOutputPath, AsciidocOptions asciidocOptions, String spaceKey, String ancestorId) throws IOException {
         ConfluencePublisherMetadata confluencePublisherMetadata = initializeConfluencePublisherMetadata(spaceKey, ancestorId);
 
-        // TODO klaus hier müssen options reingehen
         AsciidocConfluenceConverter.AdocFileVisitor visitor = new AsciidocConfluenceConverter.AdocFileVisitor(asciidocRootFolderPath, generatedDocOutputPath, asciidocOptions);
         walkFileTree(Paths.get(asciidocRootFolderPath), visitor);
 

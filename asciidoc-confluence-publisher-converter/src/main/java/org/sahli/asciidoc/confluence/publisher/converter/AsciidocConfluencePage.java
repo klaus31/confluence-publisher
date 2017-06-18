@@ -165,7 +165,7 @@ public class AsciidocConfluencePage {
             throw new RuntimeException("templateDir folder is not a folder");
         }
 
-        Map<String, Object> attributes = new HashMap<>();
+        Map<String, Object> attributes = asciidocOptions.getAttributes();
         attributes.put("imagesoutdir", asciidocOptions.getImagesOutDir());
         attributes.put("outdir", asciidocOptions.getImagesOutDir());
 

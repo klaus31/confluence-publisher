@@ -24,6 +24,8 @@ import org.sahli.asciidoc.confluence.publisher.converter.AsciidocOptions;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.hamcrest.CoreMatchers.is;
@@ -52,7 +54,8 @@ public class AsciidocConfluenceConverterTest {
         copyDirectory(new File(CLASSPATH_DOC_LOCATION), docFolder);
 
         // act
-        convertAndBuildConfluencePages(docFolderPath, generatedDocOutputPath, new AsciidocOptions(TEMPLATES_PATH), "~personalSpace", "1234");
+        Map<String, Object> attributes = new HashMap<>();
+        convertAndBuildConfluencePages(docFolderPath, generatedDocOutputPath, new AsciidocOptions(TEMPLATES_PATH, attributes), "~personalSpace", "1234");
 
         // assert
         assertThat("index.html", Files.exists(Paths.get(generatedDocOutputPath, "index.html")), is(true));
